@@ -8,6 +8,40 @@ export type PassCatalogEntry = {
   statusTone?: 'emerald' | 'amber'
 }
 
+// Maps DB planId values → display metadata
+export const planDisplayMap: Record<string, PassCatalogEntry> = {
+  monthly: {
+    passType: 'Monthly Unlimited',
+    validityPeriod: '30 days',
+    price: 390.0,
+    benefits: 'Unlimited access. Unlimited focus',
+    imageUrl:
+      'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80',
+    badgeLabel: 'Active',
+    statusTone: 'emerald',
+  },
+  quarterly: {
+    passType: 'Quarterly Pass',
+    validityPeriod: '90 days',
+    price: 990.0,
+    benefits: 'Unlimited access for 3 months',
+    imageUrl:
+      'https://images.unsplash.com/photo-1470246973918-29a93221c455?auto=format&fit=crop&w=800&q=80',
+    badgeLabel: 'Active',
+    statusTone: 'emerald',
+  },
+  annual: {
+    passType: 'Annual Pass',
+    validityPeriod: '365 days',
+    price: 3500.0,
+    benefits: 'Best value — full year of unlimited access',
+    imageUrl:
+      'https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=800&q=80',
+    badgeLabel: 'Active',
+    statusTone: 'emerald',
+  },
+};
+
 export const passCatalog: Record<string, PassCatalogEntry> = {
   'PASS-MU': {
     passType: 'Monthly Unlimited',

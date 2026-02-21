@@ -8,10 +8,8 @@ import NextVisitCard from '../../components/dashboard/NextVisitCard'
 import PlanCard from '../../components/dashboard/PlanCard'
 import StatCard, { type StatCardProps } from '../../components/dashboard/StatCard'
 import TopNavigation, { type NavItem } from '../../components/dashboard/TopNavigation'
-import { bookingData, type BookingRecord } from '../../lib/data/bookingInfo'
-import { passCatalog } from '../../lib/data/passInfo'
-import { spaceCatalog } from '../../lib/data/spaceInfo'
-import { subscriptionData } from '../../lib/data/subscriptionInfo'
+import { planDisplayMap } from '../../lib/data/passInfo'
+import { prisma } from '../../lib/prisma'
 
 const navItems: NavItem[] = [
   { label: 'Dashboard', href: '#', isActive: true },
@@ -20,13 +18,9 @@ const navItems: NavItem[] = [
   { label: 'Shop', href: '#shop' },
 ]
 
-const CURRENT_USER = {
-  id: '124124',
-  name: 'Aliffie',
-  tokensAvailable: 15,
-}
-
-const DATA_CONTEXT_DATE = new Date('2024-05-10T00:00:00Z')
+// TODO: Replace with session user once auth is wired up
+const CURRENT_USER_EMAIL = 'aliffie@cloudsy.com'
+const TOKENS_AVAILABLE = 15 // TODO: add token field to User model
 
 const dateFormatter = new Intl.DateTimeFormat('en-MY', {
   month: 'short',
@@ -43,17 +37,14 @@ const timeFormatter = new Intl.DateTimeFormat('en-MY', {
   minute: '2-digit',
 })
 
-const formatDateRange = (start: string, end: string) =>
-  `${dateFormatter.format(new Date(start))} - ${dateFormatter.format(new Date(end))}`
+const formatDateRange = (start: Date, end: Date) =>
+  `${dateFormatter.format(start)} - ${dateFormatter.format(end)}`
 
-const formatTimeRange = (start: string, end: string) =>
-  `${timeFormatter.format(new Date(start))} - ${timeFormatter.format(new Date(end))}`
+const formatTimeRange = (start: Date, end: Date) =>
+  `${timeFormatter.format(start)} - ${timeFormatter.format(end)}`
 
-const formatDurationLabel = (start: string, end: string) => {
-  const diffMinutes = Math.max(
-    0,
-    Math.round((new Date(end).getTime() - new Date(start).getTime()) / 60000),
-  )
+const formatDurationLabel = (start: Date, end: Date) => {
+  const diffMinutes = Math.max(0, Math.round((end.getTime() - start.getTime()) / 60000))
   const hours = Math.floor(diffMinutes / 60)
   const minutes = diffMinutes % 60
   if (minutes === 0) return `${hours} hour${hours === 1 ? '' : 's'}`
@@ -61,80 +52,87 @@ const formatDurationLabel = (start: string, end: string) => {
   return `${hours}h ${minutes}m`
 }
 
-const mapStatus = (statusId: BookingRecord['StatusID']): BookingRow['status'] => {
-  if (statusId === 'Completed') return 'completed'
-  if (statusId === 'Confirmed') return 'confirmed'
-  return 'cancelled'
-}
+export default async function DashboardPage() {
+  const user = await prisma.user.findUnique({
+    where: { email: CURRENT_USER_EMAIL },
+    include: {
+      subscriptions: { orderBy: { startDate: 'desc' } },
+      bookings: {
+        include: { space: true },
+        orderBy: { startDateTime: 'desc' },
+      },
+    },
+  })
 
-const findVisitDetails = (booking?: BookingRecord) => {
-  if (!booking) return null
-  const visitDate = new Date(booking.StartDateTime)
-  const space = spaceCatalog[booking.SpaceID]
-  return {
-    title: space?.SpaceType ?? `Space ${booking.SpaceID}`,
-    statusLabel: booking.StatusID,
-    date: monthFormatter.format(visitDate),
-    dayNumber: visitDate.getDate().toString(),
-    timeRange: formatTimeRange(booking.StartDateTime, booking.EndDateTime),
-    durationLabel: formatDurationLabel(booking.StartDateTime, booking.EndDateTime),
-    location: space?.Location ?? 'See concierge for details',
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-slate-500">
+        User not found.
+      </div>
+    )
   }
-}
 
-export default function DashboardPage() {
-  const userSubscriptions = subscriptionData[CURRENT_USER.id] ?? []
-  const userBookings = bookingData[CURRENT_USER.id] ?? []
+  const now = new Date()
 
-  const sortedBookings = [...userBookings].sort(
-    (a, b) => new Date(b.StartDateTime).getTime() - new Date(a.StartDateTime).getTime(),
-  )
-  const upcomingBookings = sortedBookings.filter((booking) => booking.StatusID === 'Confirmed')
+  const upcomingBookings = user.bookings.filter((b) => b.status === 'Confirmed')
 
+  // ─── Stat Cards ────────────────────────────────────────────────────────────
   const statCards: StatCardProps[] = [
-    { icon: 'confirmation_number', label: 'Active Passes', value: userSubscriptions.length },
-    { icon: 'token', label: 'Tokens Available', value: CURRENT_USER.tokensAvailable },
+    { icon: 'confirmation_number', label: 'Active Passes', value: user.subscriptions.filter((s) => s.status === 'Active').length },
+    { icon: 'token', label: 'Tokens Available', value: TOKENS_AVAILABLE },
     { icon: 'event_available', label: 'Upcoming Bookings', value: upcomingBookings.length },
   ]
 
-  const plans = userSubscriptions.map((subscription) => {
-    const pass = passCatalog[subscription.PassID]
-    const isActive = new Date(subscription.EndDateTime).getTime() >= DATA_CONTEXT_DATE.getTime()
+  // ─── Plans ─────────────────────────────────────────────────────────────────
+  const plans = user.subscriptions.map((sub) => {
+    const display = planDisplayMap[sub.planId]
+    const isActive = sub.status === 'Active' && sub.endDate.getTime() >= now.getTime()
     return {
-      key: subscription.SubscriptionID,
-      title: pass?.passType ?? subscription.PassID,
-      description: `Valid ${formatDateRange(subscription.StartDateTime, subscription.EndDateTime)}`,
+      key: sub.id,
+      title: display?.passType ?? sub.planId,
+      description: `Valid ${formatDateRange(sub.startDate, sub.endDate)}`,
       imageUrl:
-        pass?.imageUrl ??
+        display?.imageUrl ??
         'https://images.unsplash.com/photo-1470246973918-29a93221c455?auto=format&fit=crop&w=800&q=80',
-      badgeLabel: isActive ? (pass?.badgeLabel ?? 'Active') : 'Expired',
-      statusTone: pass?.statusTone ?? (isActive ? ('emerald' as const) : ('amber' as const)),
-      validityLabel: `${subscription.DurationDays} days • ${pass?.validityPeriod ?? 'Custom duration'}`,
-      price: pass?.price,
-      benefits: pass?.benefits,
+      badgeLabel: isActive ? (display?.badgeLabel ?? 'Active') : 'Expired',
+      statusTone: isActive ? (display?.statusTone ?? 'emerald' as const) : ('amber' as const),
+      validityLabel: `${sub.durationDays} days • ${display?.validityPeriod ?? 'Custom duration'}`,
+      price: display?.price,
+      benefits: display?.benefits,
       ctaLabel: 'Manage Pass',
     }
   })
 
-  const bookingRows: BookingRow[] = sortedBookings.map((booking) => {
-    const space = spaceCatalog[booking.SpaceID]
-    return {
-      id: booking.BookingID.toString(),
-      room: space?.SpaceType ?? `Space ${booking.SpaceID}`,
-      description: space?.Location ?? 'See concierge for details',
-      date: dateFormatter.format(new Date(booking.StartDateTime)),
-      timeRange: formatTimeRange(booking.StartDateTime, booking.EndDateTime),
-      status: mapStatus(booking.StatusID),
-      actionLabel:
-        booking.StatusID === 'Confirmed'
-          ? 'Manage'
-          : booking.StatusID === 'Completed'
-            ? 'Rebook'
-            : 'Details',
-    }
-  })
+  // ─── Booking Rows ──────────────────────────────────────────────────────────
+  const bookingRows: BookingRow[] = user.bookings.map((booking) => ({
+    id: booking.id.toString(),
+    room: booking.space.type,
+    description: booking.space.location,
+    date: dateFormatter.format(booking.startDateTime),
+    timeRange: formatTimeRange(booking.startDateTime, booking.endDateTime),
+    status:
+      booking.status === 'Completed'
+        ? 'completed'
+        : booking.status === 'Confirmed'
+          ? 'confirmed'
+          : 'cancelled',
+    actionLabel:
+      booking.status === 'Confirmed' ? 'Manage' : booking.status === 'Completed' ? 'Rebook' : 'Details',
+  }))
 
-  const visit = findVisitDetails(upcomingBookings[0] ?? sortedBookings[0])
+  // ─── Next Visit Card ───────────────────────────────────────────────────────
+  const nextBooking = upcomingBookings[0] ?? user.bookings[0]
+  const visit = nextBooking
+    ? {
+        title: nextBooking.space.type,
+        statusLabel: nextBooking.status,
+        date: monthFormatter.format(nextBooking.startDateTime),
+        dayNumber: nextBooking.startDateTime.getDate().toString(),
+        timeRange: formatTimeRange(nextBooking.startDateTime, nextBooking.endDateTime),
+        durationLabel: formatDurationLabel(nextBooking.startDateTime, nextBooking.endDateTime),
+        location: nextBooking.space.location,
+      }
+    : null
 
   return (
     <div className="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen">
@@ -142,7 +140,7 @@ export default function DashboardPage() {
       <main className="max-w-7xl mx-auto px-4 md:px-10 py-8">
         <HeroHeader
           title="My Passes &amp; Plans"
-          description={`Welcome back, ${CURRENT_USER.name}. Manage your access and track upcoming visits.`}
+          description={`Welcome back, ${user.name}. Manage your access and track upcoming visits.`}
           ctaLabel="Book Space"
         />
 
