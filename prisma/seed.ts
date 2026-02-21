@@ -168,6 +168,78 @@ async function main() {
     },
   });
   console.log('✅ Active booking: 1 (Confirmed)');
+
+  // ─── Customer: Intan ──────────────────────────────────────────────────────
+  const intan = await prisma.user.upsert({
+    where: { email: 'intan@cloudsy.com' },
+    update: {},
+    create: {
+      name: 'Intan',
+      email: 'intan@cloudsy.com',
+      passwordHash: '843843', // TODO: hash with bcrypt before production
+      role: UserRole.User,
+    },
+  });
+  console.log('✅ Customer:', intan.email);
+
+  // ─── 3-Day Pass Subscription ──────────────────────────────────────────────
+  await prisma.subscription.upsert({
+    where: { id: 'sub-intan-3day' },
+    update: {},
+    create: {
+      id: 'sub-intan-3day',
+      userId: intan.id,
+      planId: '3day',
+      startDate: new Date('2026-02-18'),
+      endDate: new Date('2026-02-21'),
+      durationDays: 3,
+      status: SubscriptionStatus.Expired,
+    },
+  });
+  console.log('✅ Subscription: 3-day pass (expired)');
+
+  // ─── Past Bookings (Completed) ────────────────────────────────────────────
+  await prisma.booking.upsert({
+    where: { id: 4 },
+    update: {},
+    create: {
+      id: 4,
+      userId: intan.id,
+      spaceId: spaces[0].id, // Hot Desk A1
+      startDateTime: new Date('2026-02-18T09:00:00'),
+      endDateTime: new Date('2026-02-18T17:00:00'),
+      status: BookingStatus.Completed,
+    },
+  });
+
+  await prisma.booking.upsert({
+    where: { id: 5 },
+    update: {},
+    create: {
+      id: 5,
+      userId: intan.id,
+      spaceId: spaces[1].id, // Meeting Room 1
+      startDateTime: new Date('2026-02-19T10:00:00'),
+      endDateTime: new Date('2026-02-19T12:00:00'),
+      status: BookingStatus.Completed,
+    },
+  });
+  console.log('✅ Past bookings: 2 (Completed)');
+
+  // ─── Cancelled Booking ────────────────────────────────────────────────────
+  await prisma.booking.upsert({
+    where: { id: 6 },
+    update: {},
+    create: {
+      id: 6,
+      userId: intan.id,
+      spaceId: spaces[2].id, // Focus Pod 1
+      startDateTime: new Date('2026-02-20T14:00:00'),
+      endDateTime: new Date('2026-02-20T18:00:00'),
+      status: BookingStatus.Cancelled,
+    },
+  });
+  console.log('✅ Cancelled booking: 1 (Cancelled)');
 }
 
 main()

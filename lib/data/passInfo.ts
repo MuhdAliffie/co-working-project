@@ -20,11 +20,11 @@ export const planDisplayMap: Record<string, PassCatalogEntry> = {
     badgeLabel: 'Active',
     statusTone: 'emerald',
   },
-  quarterly: {
-    passType: 'Quarterly Pass',
-    validityPeriod: '90 days',
-    price: 990.0,
-    benefits: 'Unlimited access for 3 months',
+  daily: {
+    passType: 'Daily Pass',
+    validityPeriod: '1 day',
+    price: 25.0,
+    benefits: 'Access for one day',
     imageUrl:
       'https://images.unsplash.com/photo-1470246973918-29a93221c455?auto=format&fit=crop&w=800&q=80',
     badgeLabel: 'Active',
@@ -39,6 +39,16 @@ export const planDisplayMap: Record<string, PassCatalogEntry> = {
       'https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=800&q=80',
     badgeLabel: 'Active',
     statusTone: 'emerald',
+  },
+  '3day': {
+    passType: '3-Day Pass',
+    validityPeriod: '3 days',
+    price: 65.0,
+    benefits: 'Flexible 3-day access',
+    imageUrl:
+      'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80',
+    badgeLabel: 'Expired',
+    statusTone: 'amber',
   },
 };
 
