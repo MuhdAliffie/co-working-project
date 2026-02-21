@@ -1,26 +1,42 @@
 @import "tailwindcss";
 
+@theme {
+  --color-cloud-forest: #2C3E26;
+  --color-cloud-brand: #4A6741;
+  --color-cloud-sage: #A7C4A0;
+  --color-cloud-muted: #E8EEDF;
+  --color-cloud-surface: #FDFCF8;
+  
+  --font-family-display: var(--font-dm-serif);
+  --font-sans: var(--font-inter);
+  
+  --border-radius-4xl: 2rem;
+  --border-radius-5xl: 3rem;
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Use next/font variables as fallbacks if needed, but they are set on body via className */
+  --font-inter: 'Inter', sans-serif; 
+  /* DM Serif Display loaded via next/font */
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  min-height: 100vh;
+  background-color: var(--color-cloud-surface);
+  color: #0f172a;
+  font-family: var(--font-sans);
 }
+
+body.dark {
+  background-color: #0f1f17;
+  color: #f8fafc;
+}
+
+/* Material Symbols - keeping the import if needed, or replace with Lucide completely */
+/* The frontend imports material symbols, but uses Lucide in components. Let's keep it just in case. */
+/* Actually, the frontend components I checked use 'lucide-react'. I'll skip material symbols unless found otherwise. */
+
+/* Basic reset if needed, but Tailwind handles most */

@@ -1,0 +1,157 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Users ───────────────────────────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         UserRole @default(User)
+  membershipId String?  @unique
+  telephone    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  subscriptions Subscription[]
+  bookings      Booking[]
+  orders        Order[]
+}
+
+enum UserRole {
+  User
+  Admin
+  Kitchen
+}
+
+// ─── Subscriptions ───────────────────────────────────────────────────────────
+
+model Subscription {
+  id           String             @id @default(cuid())
+  userId       String
+  planId       String
+  startDate    DateTime
+  endDate      DateTime
+  durationDays Int
+  status       SubscriptionStatus @default(Active)
+  createdAt    DateTime           @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+enum SubscriptionStatus {
+  Active
+  Expired
+  Cancelled
+}
+
+// ─── Spaces ──────────────────────────────────────────────────────────────────
+
+model Space {
+  id           Int       @id @default(autoincrement())
+  name         String
+  type         SpaceType
+  capacity     Int
+  location     String
+  availability Boolean   @default(true)
+  pricePerHour Float
+
+  bookings Booking[]
+  orders   Order[]
+}
+
+enum SpaceType {
+  HotDesk
+  MeetingRoom
+  FocusPod
+  FlowZone
+  CreativeZone
+}
+
+// ─── Bookings ─────────────────────────────────────────────────────────────────
+
+model Booking {
+  id            Int           @id @default(autoincrement())
+  userId        String
+  spaceId       Int
+  startDateTime DateTime
+  endDateTime   DateTime
+  status        BookingStatus @default(Confirmed)
+  createdAt     DateTime      @default(now())
+
+  user  User  @relation(fields: [userId], references: [id])
+  space Space @relation(fields: [spaceId], references: [id])
+}
+
+enum BookingStatus {
+  Confirmed
+  Cancelled
+  Completed
+}
+
+// ─── Menu Items (F&B) ─────────────────────────────────────────────────────────
+
+model MenuItem {
+  id          Int              @id @default(autoincrement())
+  name        String
+  category    MenuItemCategory
+  price       Float
+  imageUrl    String?
+  description String?
+  isAvailable Boolean          @default(true)
+
+  orderItems OrderItem[]
+}
+
+enum MenuItemCategory {
+  Food
+  Drink
+  Snack
+}
+
+// ─── Orders ───────────────────────────────────────────────────────────────────
+
+model Order {
+  id         Int         @id @default(autoincrement())
+  userId     String
+  spaceId    Int
+  status     OrderStatus @default(Pending)
+  totalPrice Float
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  user  User       @relation(fields: [userId], references: [id])
+  space Space      @relation(fields: [spaceId], references: [id])
+  items OrderItem[]
+}
+
+enum OrderStatus {
+  Pending
+  Accepted
+  InKitchen
+  Completed
+  Rejected
+}
+
+// ─── Order Items ──────────────────────────────────────────────────────────────
+
+model OrderItem {
+  id           Int   @id @default(autoincrement())
+  orderId      Int
+  menuItemId   Int
+  quantity     Int
+  priceAtOrder Float
+
+  order    Order    @relation(fields: [orderId], references: [id])
+  menuItem MenuItem @relation(fields: [menuItemId], references: [id])
+}
