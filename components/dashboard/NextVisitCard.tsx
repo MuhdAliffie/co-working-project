@@ -12,44 +12,51 @@ type NextVisitCardProps = {
   visit: VisitDetails
 }
 
-const NextVisitCard = ({ visit }: NextVisitCardProps) => {
-  return (
-    <section>
-      <h3 className="text-xl font-bold flex items-center gap-2 mb-6">
-        <span className="material-symbols-outlined text-emerald-400">calendar_today</span>
-        Next Visit
-      </h3>
-      <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl border-2 border-emerald-200 p-6 shadow-sm">
-        <div className="flex items-start justify-between mb-4">
-          <div>
-            <h4 className="text-2xl font-black text-slate-900 dark:text-white">{visit.title}</h4>
-            <p className="text-emerald-500 font-bold uppercase text-xs tracking-[0.3em] mt-1">
-              {visit.statusLabel}
-            </p>
-          </div>
-          <div className="bg-white dark:bg-slate-950/40 h-16 w-16 rounded-xl flex flex-col items-center justify-center border border-emerald-200">
-            <span className="text-[10px] font-bold text-slate-400 uppercase">{visit.date}</span>
-            <span className="text-2xl font-black text-slate-900 dark:text-white leading-none">
-              {visit.dayNumber}
-            </span>
-          </div>
+const ICON_VAR = "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 48"
+
+const NextVisitCard = ({ visit }: NextVisitCardProps) => (
+  <section>
+    <h3 className="text-2xl font-handwritten font-bold flex items-center gap-2 mb-6 text-cloud-dark-green">
+      <span
+        className="material-symbols-outlined text-cloud-green"
+        style={{ fontVariationSettings: ICON_VAR }}
+      >
+        celebration
+      </span>
+      Next Adventure
+    </h3>
+    <div
+      className="bg-white border-2 border-cloud-green p-8 shadow-xl rotate-1 relative overflow-hidden"
+      style={{ borderRadius: '20px 60px 20px 50px/50px 20px 60px 20px' }}
+    >
+      <div className="absolute top-0 right-0 p-4 opacity-10">
+        <span className="material-symbols-outlined text-8xl" style={{ fontVariationSettings: "'FILL' 1" }}>forest</span>
+      </div>
+      <div className="flex items-start justify-between mb-6">
+        <div>
+          <h4 className="text-4xl font-handwritten font-bold text-cloud-dark-green">{visit.title}</h4>
+          <p className="font-handwritten font-bold text-xl italic text-cloud-dark-green border-b-2 border-cloud-green inline-block">
+            {visit.statusLabel}!
+          </p>
         </div>
-        <div className="space-y-3 mb-6 text-slate-600 dark:text-slate-300">
-          <div className="flex items-center gap-3">
-            <span className="material-symbols-outlined text-lg">schedule</span>
-            <span className="text-sm font-medium">
-              {visit.timeRange} ({visit.durationLabel})
-            </span>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="material-symbols-outlined text-lg">location_on</span>
-            <span className="text-sm font-medium">{visit.location}</span>
-          </div>
+        <div className="bg-yellow-50 h-16 w-16 wavy-border flex flex-col items-center justify-center -rotate-6">
+          <span className="text-xs font-bold text-stone-400 uppercase">{visit.date}</span>
+          <span className="text-3xl font-handwritten font-bold text-cloud-dark-green leading-none">{visit.dayNumber}</span>
         </div>
       </div>
-    </section>
-  )
-}
+      <div className="space-y-4 mb-8">
+        <div className="flex items-center gap-3 font-handwritten text-xl">
+          <span className="material-symbols-outlined text-cloud-green" style={{ fontVariationSettings: ICON_VAR }}>schedule</span>
+          <span>{visit.timeRange} ({visit.durationLabel})</span>
+        </div>
+        <div className="flex items-center gap-3 font-handwritten text-xl">
+          <span className="material-symbols-outlined text-cloud-green" style={{ fontVariationSettings: ICON_VAR }}>location_on</span>
+          <span>{visit.location}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+)
 
 export type { NextVisitCardProps, VisitDetails }
 export default NextVisitCard

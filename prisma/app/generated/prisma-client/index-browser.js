@@ -163,10 +163,16 @@ exports.Prisma.BookingScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.CategoryScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  slug: 'slug'
+};
+
 exports.Prisma.MenuItemScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  category: 'category',
+  categoryId: 'categoryId',
   price: 'price',
   imageUrl: 'imageUrl',
   description: 'description',
@@ -231,12 +237,6 @@ exports.BookingStatus = exports.$Enums.BookingStatus = {
   Completed: 'Completed'
 };
 
-exports.MenuItemCategory = exports.$Enums.MenuItemCategory = {
-  Food: 'Food',
-  Drink: 'Drink',
-  Snack: 'Snack'
-};
-
 exports.OrderStatus = exports.$Enums.OrderStatus = {
   Pending: 'Pending',
   Accepted: 'Accepted',
@@ -250,6 +250,7 @@ exports.Prisma.ModelName = {
   Subscription: 'Subscription',
   Space: 'Space',
   Booking: 'Booking',
+  Category: 'Category',
   MenuItem: 'MenuItem',
   Order: 'Order',
   OrderItem: 'OrderItem'

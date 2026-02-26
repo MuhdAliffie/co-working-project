@@ -24,15 +24,9 @@ type PlanCardProps = {
   benefits?: string
 }
 
-const currencyFormatter = new Intl.NumberFormat('en-MY', {
-  style: 'currency',
-  currency: 'MYR',
-  minimumFractionDigits: 2,
-})
-
-const toneClasses: Record<StatusTone, string> = {
-  emerald: 'bg-emerald-400 text-emerald-950',
-  amber: 'bg-amber-400 text-amber-950',
+const badgeClass: Record<StatusTone, string> = {
+  emerald: 'bg-yellow-300 text-stone-800 rotate-3',
+  amber: 'bg-blue-300 text-stone-800 -rotate-3',
 }
 
 const PlanCard: FC<PlanCardProps> = ({
@@ -44,12 +38,11 @@ const PlanCard: FC<PlanCardProps> = ({
   progress,
   punchCard,
   ctaLabel,
-  price,
   validityLabel,
   benefits,
 }) => (
-  <article className="bg-white dark:bg-slate-950/40 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm group hover:border-emerald-200 transition-all">
-    <div className="h-32 bg-slate-200 dark:bg-slate-900 relative">
+  <article className="paper-card overflow-hidden group hover:scale-[1.02] transition-all !p-0">
+    <div className="h-32 relative border-b-2 border-cloud-green overflow-hidden">
       <Image
         src={imageUrl}
         alt={title}
@@ -59,43 +52,42 @@ const PlanCard: FC<PlanCardProps> = ({
         unoptimized
       />
       <span
-        className={`absolute top-3 right-3 text-[10px] font-bold px-2 py-1 rounded uppercase ${toneClasses[statusTone]}`}
+        className={`absolute top-3 right-3 text-xs font-bold px-3 py-1 wavy-border ${badgeClass[statusTone]}`}
       >
         {badgeLabel}
       </span>
     </div>
     <div className="p-5 space-y-4">
       <div>
-        <h4 className="font-bold text-lg text-slate-900 dark:text-white">{title}</h4>
-        <p className="text-sm text-slate-500">{description}</p>
-        {validityLabel ? <p className="text-xs text-slate-400 mt-1">{validityLabel}</p> : null}
-        {price ? (
-          <p className="text-base font-semibold text-slate-900 dark:text-white mt-3">
-            {currencyFormatter.format(price)}
-          </p>
-        ) : null}
-        {benefits ? <p className="text-xs text-slate-500 mt-1">{benefits}</p> : null}
+        <h4 className="font-handwritten font-bold text-2xl text-cloud-dark-green">{title}</h4>
+        <p className="font-handwritten text-stone-500">{description}</p>
+        {validityLabel && <p className="text-xs text-stone-400 mt-1">{validityLabel}</p>}
+        {benefits && <p className="text-xs text-stone-500 mt-1">{benefits}</p>}
       </div>
       {progress ? (
         <div>
-          <div className="w-full bg-slate-100 dark:bg-slate-900/80 h-2 rounded-full overflow-hidden">
+          <div className="w-full bg-stone-100 h-4 border-2 border-stone-200 rounded-full overflow-hidden">
             <div
-              className="bg-emerald-400 h-full rounded-full"
+              className="bg-cloud-green h-full rounded-full border-r-2 border-cloud-dark-green"
               style={{ width: `${Math.min(progress.value, 100)}%` }}
             />
           </div>
-          <div className="flex justify-between mt-2 text-[11px] font-medium text-slate-400">
+          <div className="flex justify-between mt-2 font-handwritten text-stone-500 text-sm">
             <span>{progress.leftLabel}</span>
             <span>{progress.rightLabel}</span>
           </div>
         </div>
       ) : null}
       {punchCard ? (
-        <div className="flex gap-1.5">
+        <div className="flex gap-1.5 mb-4">
           {Array.from({ length: punchCard.segments }).map((_, index) => (
             <div
-              key={`segment-${title}-${index}`}
-              className={`h-2 flex-1 rounded-full ${index < punchCard.used ? 'bg-emerald-400' : 'bg-slate-200 dark:bg-slate-900/70'}`}
+              key={`punch-${title}-${index}`}
+              className={`h-4 flex-1 rounded-sm border ${
+                index < punchCard.used
+                  ? 'bg-cloud-green border-cloud-dark-green'
+                  : 'bg-stone-100 border-stone-200'
+              }`}
             />
           ))}
         </div>
@@ -103,7 +95,7 @@ const PlanCard: FC<PlanCardProps> = ({
       {ctaLabel ? (
         <button
           type="button"
-          className="w-full py-2 bg-slate-100 dark:bg-slate-900/80 text-slate-700 dark:text-slate-300 rounded-lg font-semibold text-sm hover:bg-slate-200 dark:hover:bg-slate-900"
+          className="w-full py-2 bg-stone-100 border-2 border-stone-300 rounded-xl font-handwritten font-bold text-stone-600 hover:bg-white transition-colors"
         >
           {ctaLabel}
         </button>

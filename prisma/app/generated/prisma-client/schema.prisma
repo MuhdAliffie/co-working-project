@@ -99,24 +99,29 @@ enum BookingStatus {
   Completed
 }
 
+// ─── Menu Categories ─────────────────────────────────────────────────────────
+
+model Category {
+  id   Int    @id @default(autoincrement())
+  name String
+  slug String @unique
+
+  menuItems MenuItem[]
+}
+
 // ─── Menu Items (F&B) ─────────────────────────────────────────────────────────
 
 model MenuItem {
-  id          Int              @id @default(autoincrement())
-  name        String
-  category    MenuItemCategory
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  categoryId  Int
   price       Float
   imageUrl    String?
   description String?
-  isAvailable Boolean          @default(true)
+  isAvailable Boolean @default(true)
 
+  category   Category    @relation(fields: [categoryId], references: [id])
   orderItems OrderItem[]
-}
-
-enum MenuItemCategory {
-  Food
-  Drink
-  Snack
 }
 
 // ─── Orders ───────────────────────────────────────────────────────────────────

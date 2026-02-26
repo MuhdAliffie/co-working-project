@@ -7,25 +7,35 @@ type CalloutCardProps = {
   icon?: string
 }
 
-const CalloutCard: FC<CalloutCardProps> = ({
-  title,
-  description,
-  actionLabel,
-  icon = 'arrow_forward',
-}) => (
-  <section className="bg-slate-900 dark:bg-slate-950 rounded-2xl p-6 text-white overflow-hidden relative">
+const ICON_VAR = "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 48"
+
+const CalloutCard: FC<CalloutCardProps> = ({ title, description, actionLabel }) => (
+  <section
+    className="text-white relative overflow-hidden -rotate-1 p-6"
+    style={{
+      backgroundColor: '#166534',
+      border: '2px solid #86EFAC',
+      borderRadius: '10px 40px 10px 30px/30px 10px 40px 10px',
+      boxShadow: '2px 5px 15px rgba(0,0,0,0.05)',
+    }}
+  >
     <div className="relative z-10">
-      <h4 className="text-lg font-bold mb-2">{title}</h4>
-      <p className="text-slate-300 text-sm mb-4">{description}</p>
-      <button className="text-emerald-400 font-bold text-sm flex items-center gap-2 group">
+      <h4 className="text-2xl font-handwritten font-bold mb-2">{title}</h4>
+      <p className="font-handwritten text-lg text-cloud-green mb-4">{description}</p>
+      <button
+        className="sticker-btn font-handwritten px-6 py-3"
+        style={{ background: 'white', color: '#166534', borderColor: 'white', boxShadow: '4px 4px 0px rgba(255,255,255,0.3)' }}
+      >
         {actionLabel}
-        <span className="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">
-          {icon}
-        </span>
       </button>
     </div>
-    <div className="absolute -bottom-6 -right-6 text-emerald-500/10 rotate-12">
-      <span className="material-symbols-outlined text-[120px]">groups</span>
+    <div className="absolute -bottom-6 -right-6 text-white/10 rotate-12">
+      <span
+        className="material-symbols-outlined text-[100px]"
+        style={{ fontVariationSettings: ICON_VAR }}
+      >
+        groups
+      </span>
     </div>
   </section>
 )
@@ -35,12 +45,15 @@ type InfoBannerProps = {
   message: ReactNode
 }
 
-const InfoBanner: FC<InfoBannerProps> = ({ icon, message }) => (
-  <div className="p-4 rounded-xl border border-dashed border-slate-300 dark:border-slate-800">
-    <div className="flex items-center gap-3 text-xs text-slate-500">
-      {icon ?? <span className="material-symbols-outlined text-slate-400">help_center</span>}
-      <div>{message}</div>
-    </div>
+const InfoBanner: FC<InfoBannerProps> = ({ message }) => (
+  <div className="p-6 wavy-border border-dashed border-stone-300 bg-white/50 text-center">
+    <span
+      className="material-symbols-outlined text-stone-400 mb-2 block text-3xl"
+      style={{ fontVariationSettings: ICON_VAR }}
+    >
+      help_center
+    </span>
+    <p className="font-handwritten text-stone-500 text-lg">{message}</p>
   </div>
 )
 

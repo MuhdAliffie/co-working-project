@@ -10,6 +10,8 @@ type HeroHeaderProps = {
   onCtaClick?: () => void
 }
 
+const ICON_VAR = "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 48"
+
 const HeroHeader: FC<HeroHeaderProps> = ({
   title,
   description,
@@ -17,19 +19,24 @@ const HeroHeader: FC<HeroHeaderProps> = ({
   ctaIcon = 'add_circle',
   onCtaClick,
 }) => (
-  <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+  <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
     <div>
-      <h1 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
+      <h2 className="text-4xl md:text-5xl font-handwritten font-bold text-cloud-dark-green">
         {title}
-      </h1>
-      <p className="text-slate-500 dark:text-slate-400 mt-2 text-lg">{description}</p>
+      </h2>
+      <p className="text-stone-500 mt-2 text-xl font-handwritten">{description}</p>
     </div>
     <button
       type="button"
       onClick={onCtaClick}
-      className="bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-bold px-6 py-3 rounded-xl flex items-center gap-2 transition-all shadow-lg shadow-emerald-300/40"
+      className="sticker-btn gap-2 font-handwritten text-xl px-6 py-3"
     >
-      <span className="material-symbols-outlined">{ctaIcon}</span>
+      <span
+        className="material-symbols-outlined"
+        style={{ fontVariationSettings: ICON_VAR }}
+      >
+        {ctaIcon}
+      </span>
       {ctaLabel}
     </button>
   </div>

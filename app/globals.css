@@ -1,15 +1,32 @@
 @import "tailwindcss";
 
 @theme {
+  /* ── Original brand colors ───────────────────────────────── */
   --color-cloud-forest: #2C3E26;
   --color-cloud-brand: #4A6741;
   --color-cloud-sage: #A7C4A0;
   --color-cloud-muted: #E8EEDF;
   --color-cloud-surface: #FDFCF8;
-  
+
+  /* ── Dashboard / Booking whimsical palette ──────────────── */
+  --color-cloud-cream: #FCF9F2;
+  --color-cloud-green: #4ADE80;
+  --color-cloud-dark-green: #166534;
+  --color-cloud-border: #86EFAC;
+  --color-paper-white: #FFFFFF;
+
+  /* ── Fonts ───────────────────────────────────────────────── */
   --font-family-display: var(--font-dm-serif);
   --font-sans: var(--font-inter);
-  
+  --font-family-handwritten: 'Gaegu', cursive;
+  --font-family-casual: 'Nunito', sans-serif;
+  --font-family-marker: 'Patrick Hand', cursive;
+
+  /* ── Shop / Cafe fonts (loaded via shop layout) ─────────── */
+  --font-family-cafe-display: 'Caveat', cursive;
+  --font-family-cafe-mono: 'Courier Prime', monospace;
+  --font-family-cafe-body: 'Gaegu', sans-serif;
+
   --border-radius-4xl: 2rem;
   --border-radius-5xl: 3rem;
 }
@@ -17,26 +34,111 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  /* Use next/font variables as fallbacks if needed, but they are set on body via className */
-  --font-inter: 'Inter', sans-serif; 
-  /* DM Serif Display loaded via next/font */
+  --font-inter: 'Inter', sans-serif;
 }
 
+/* ── Global background: cream + green dot grid ───────────── */
 body {
   margin: 0;
   min-height: 100vh;
-  background-color: var(--color-cloud-surface);
-  color: #0f172a;
-  font-family: var(--font-sans);
+  background-color: #FCF9F2;
+  background-image: radial-gradient(#86efac33 1px, transparent 1px);
+  background-size: 20px 20px;
+  color: #1c1917;
+  font-family: 'Nunito', 'Gaegu', sans-serif;
 }
 
-body.dark {
-  background-color: #0f1f17;
-  color: #f8fafc;
+/* ── Whimsical utility classes ───────────────────────────── */
+
+/* Green organic border — used for dashboard wavy accents */
+.wavy-border {
+  border: 3px solid #86EFAC;
+  border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
 }
 
-/* Material Symbols - keeping the import if needed, or replace with Lucide completely */
-/* The frontend imports material symbols, but uses Lucide in components. Let's keep it just in case. */
-/* Actually, the frontend components I checked use 'lucide-react'. I'll skip material symbols unless found otherwise. */
+/* Paper card — dashboard cards */
+.paper-card {
+  background: white;
+  padding: 1.5rem;
+  border: 2px solid #86EFAC;
+  border-radius: 10px 40px 10px 30px/30px 10px 40px 10px;
+  box-shadow: 2px 5px 15px rgba(0, 0, 0, 0.05);
+}
 
-/* Basic reset if needed, but Tailwind handles most */
+/* Sticker button — green with dark border + drop shadow */
+.sticker-btn {
+  display: inline-flex;
+  align-items: center;
+  background: #4ADE80;
+  color: #166534;
+  font-weight: bold;
+  border: 2px solid #166534;
+  border-radius: 50px 20px 40px 20px/20px 40px 20px 50px;
+  box-shadow: 4px 4px 0px #166534;
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+.sticker-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 6px 6px 0px #166534;
+}
+.sticker-btn:active {
+  transform: scale(0.97);
+  box-shadow: 2px 2px 0px #166534;
+}
+
+/* Booking card: dark-ink border with drop shadow */
+.hand-drawn-card {
+  border: 2px solid #4b5563;
+  border-radius: 2% 1% 2% 4% / 1% 2% 1% 1%;
+  box-shadow: 4px 4px 0px #4b5563;
+}
+
+/* Shop card: organic green border */
+.hand-drawn-border {
+  border: 2px solid #4a7c59;
+  border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+}
+
+/* Booking page: wavy sketch dividers */
+.sketch-line-h {
+  background-image: url("data:image/svg+xml,%3Csvg width='100%25' height='2' viewBox='0 0 100 2' preserveAspectRatio='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 1 C 20 0.5, 40 1.5, 60 1 C 80 0.5, 100 1' stroke='%234b5563' stroke-width='0.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  height: 2px;
+  border: none;
+}
+.sketch-line-v {
+  background-image: url("data:image/svg+xml,%3Csvg width='2' height='100%25' viewBox='0 0 2 100' preserveAspectRatio='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 0 C 0.5 20, 1.5 40, 1 60 C 0.5 80, 1 100' stroke='%234b5563' stroke-width='0.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat: repeat-y;
+  width: 2px;
+}
+
+/* Timeline booking grid cells */
+.timeline-cell {
+  border-right: 1px dashed #d1d5db;
+  transition: background-color 0.1s;
+  cursor: pointer;
+}
+.timeline-cell:nth-child(even) {
+  background-color: rgba(74, 222, 128, 0.02);
+}
+.timeline-cell:hover {
+  background-color: rgba(74, 222, 128, 0.08);
+}
+.timeline-cell.selected {
+  background-color: rgba(74, 222, 128, 0.25);
+}
+
+/* ── Shop cart overlay animation ─────────────────────────── */
+@keyframes cartSlideIn {
+  from { opacity: 0; transform: translateY(1rem); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-cart-in {
+  animation: cartSlideIn 0.3s ease-out both;
+}
+
+/* ── Thin custom scrollbar for shop / booking ────────────── */
+.shop-scroll::-webkit-scrollbar       { width: 8px; }
+.shop-scroll::-webkit-scrollbar-track { background: transparent; }
+.shop-scroll::-webkit-scrollbar-thumb { background: #4a7c5944; border-radius: 10px; }

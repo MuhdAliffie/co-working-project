@@ -13,67 +13,62 @@ export type BookingRow = {
 }
 
 const statusStyles: Record<BookingStatus, string> = {
-  completed: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300',
-  confirmed: 'bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300',
-  cancelled: 'bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-300',
+  completed: 'bg-green-100 border border-green-300 text-green-700',
+  confirmed: 'bg-blue-100 border border-blue-300 text-blue-700',
+  cancelled: 'bg-stone-100 border border-stone-300 text-stone-600',
 }
+
+const ICON_VAR = "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 48"
 
 const BookingHistoryTable: FC<{ rows: BookingRow[] }> = ({ rows }) => (
   <section>
     <div className="flex items-center justify-between mb-6">
-      <h3 className="text-xl font-bold flex items-center gap-2">
-        <span className="material-symbols-outlined text-emerald-400">history</span>
-        Booking History
+      <h3 className="text-2xl font-handwritten font-bold flex items-center gap-2 text-cloud-dark-green">
+        <span
+          className="material-symbols-outlined text-cloud-green"
+          style={{ fontVariationSettings: ICON_VAR }}
+        >
+          history_edu
+        </span>
+        Cloud Memories
       </h3>
-      <button className="p-2 bg-white dark:bg-slate-950/40 border border-slate-200 dark:border-slate-800 rounded-lg">
-        <span className="material-symbols-outlined text-slate-500">tune</span>
-      </button>
     </div>
-    <div className="bg-white dark:bg-slate-950/40 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
-      <table className="w-full text-left">
-        <thead>
-          <tr className="bg-slate-50 dark:bg-slate-900/60 border-b border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-500 uppercase">
-            <th className="px-6 py-4">Room / Activity</th>
-            <th className="px-6 py-4">Date &amp; Time</th>
-            <th className="px-6 py-4 text-center">Status</th>
-            <th className="px-6 py-4 text-right">Action</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-slate-100 dark:divide-slate-900/50">
-          {rows.map((row) => (
-            <tr key={row.id}>
-              <td className="px-6 py-4">
-                <div className="font-semibold text-slate-900 dark:text-white">{row.room}</div>
-                <p className="text-xs text-slate-500">{row.description}</p>
-              </td>
-              <td className="px-6 py-4">
-                <div className="text-sm font-medium">{row.date}</div>
-                <p className="text-xs text-slate-400">{row.timeRange}</p>
-              </td>
-              <td className="px-6 py-4 text-center">
-                <span
-                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusStyles[row.status]}`}
-                >
-                  {row.status === 'completed'
-                    ? 'Completed'
-                    : row.status === 'confirmed'
-                      ? 'Confirmed'
-                      : 'Cancelled'}
-                </span>
-              </td>
-              <td className="px-6 py-4 text-right">
-                <button className="text-emerald-500 font-bold text-sm hover:text-emerald-400">
-                  {row.actionLabel}
-                </button>
-              </td>
+    <div className="paper-card !p-0 overflow-hidden">
+      <div className="overflow-x-auto">
+        <table className="w-full text-left font-handwritten text-lg">
+          <thead className="bg-cloud-green/20 border-b-2 border-cloud-green">
+            <tr>
+              <th className="px-6 py-4 font-bold text-cloud-dark-green uppercase text-sm tracking-wider">Activity</th>
+              <th className="px-6 py-4 font-bold text-cloud-dark-green uppercase text-sm tracking-wider">When?</th>
+              <th className="px-6 py-4 font-bold text-cloud-dark-green uppercase text-sm tracking-wider text-center">Cloud Status</th>
+              <th className="px-6 py-4 font-bold text-cloud-dark-green uppercase text-sm tracking-wider text-right">Action</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-      <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-900/50 flex justify-center">
-        <button className="text-sm font-semibold text-slate-500 hover:text-emerald-400">
-          Load more history
-        </button>
+          </thead>
+          <tbody className="divide-y divide-cloud-green/10">
+            {rows.map((row) => (
+              <tr key={row.id}>
+                <td className="px-6 py-4">
+                  <div className="font-bold text-cloud-dark-green text-xl">{row.room}</div>
+                  <div className="text-sm text-stone-400">{row.description}</div>
+                </td>
+                <td className="px-6 py-4 text-stone-600">
+                  <div>{row.date}</div>
+                  <div className="text-sm">{row.timeRange}</div>
+                </td>
+                <td className="px-6 py-4 text-center">
+                  <span className={`px-3 py-1 rounded-full text-sm ${statusStyles[row.status]}`}>
+                    {row.status === 'completed' ? 'Perfect' : row.status === 'confirmed' ? 'Confirmed' : 'Cancelled'}
+                  </span>
+                </td>
+                <td className="px-6 py-4 text-right">
+                  <button className="text-cloud-green font-bold hover:underline">
+                    {row.actionLabel}
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   </section>

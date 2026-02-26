@@ -1,10 +1,17 @@
 import 'dotenv/config';
-import { PrismaClient, UserRole, SpaceType, MenuItemCategory, SubscriptionStatus, BookingStatus } from './app/generated/prisma-client';
+import { PrismaClient, UserRole, SpaceType, SubscriptionStatus, BookingStatus } from './app/generated/prisma-client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
 
+// Strip sslmode from the URL so pg doesn't parse it and emit a deprecation warning.
+function stripSslMode(url: string): string {
+  const u = new URL(url);
+  u.searchParams.delete('sslmode');
+  return u.toString();
+}
+
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: stripSslMode(process.env.DATABASE_URL!),
   ssl: { rejectUnauthorized: true },
 });
 const adapter = new PrismaPg(pool);
@@ -62,40 +69,83 @@ async function main() {
   ]);
   console.log('✅ Spaces:', spaces.map((s) => s.name).join(', '));
 
+  // ─── Menu Categories ──────────────────────────────────────────────────────
+  const categories = [
+    { name: 'Coffee',       slug: 'coffee' },
+    { name: 'Tea',          slug: 'tea' },
+    { name: 'Matcha',       slug: 'matcha' },
+    { name: 'Others',       slug: 'others' },
+    { name: 'Sandwiches',   slug: 'sandwiches' },
+    { name: 'Noodles',      slug: 'noodles' },
+    { name: 'Rice Bowls',   slug: 'rice-bowls' },
+    { name: 'Pastries',     slug: 'pastries' },
+    { name: 'Finger Foods', slug: 'finger-foods' },
+    { name: 'Specials',     slug: 'specials' },
+  ];
+
+  for (const cat of categories) {
+    await prisma.category.upsert({
+      where: { slug: cat.slug },
+      update: {},
+      create: cat,
+    });
+  }
+  console.log('✅ Categories:', categories.map((c) => c.name).join(', '));
+
   // ─── Menu Items ───────────────────────────────────────────────────────────
-  const menuItems = await Promise.all([
-    prisma.menuItem.upsert({
-      where: { id: 1 },
-      update: {},
+  const menuItems = [
+    // Coffee & Classics
+    { name: 'Signature Blend (Americano)',         price: 10, categorySlug: 'coffee' },
+    { name: 'Signature Blend (Latte)',             price: 11, categorySlug: 'coffee' },
+    { name: 'Exotic Blend (Americano)',            price: 12, categorySlug: 'coffee' },
+    { name: 'Exotic Blend (Latte)',                price: 13, categorySlug: 'coffee' },
+    { name: 'Vit C Tea',        description: 'Rose, jasmine, dried lemons',   price: 10, categorySlug: 'tea' },
+    { name: 'Digestive Tea',    description: 'Rose, jasmine, dried kumquat',  price: 10, categorySlug: 'tea' },
+    { name: 'Sooth Tea',        description: 'Jasmine, dried snow pear',      price: 10, categorySlug: 'tea' },
+    { name: 'Mocha',            price: 15, categorySlug: 'others' },
+    { name: 'Chocolate',        price: 13, categorySlug: 'others' },
+    // Matcha Series
+    { name: 'Matcha Latte',                price: 16, categorySlug: 'matcha' },
+    { name: 'Hojicha Latte',               price: 16, categorySlug: 'matcha' },
+    { name: 'Genmaicha Latte',             price: 16, categorySlug: 'matcha' },
+    { name: 'Strawberry Matcha Latte',     price: 18, categorySlug: 'matcha' },
+    { name: 'Blueberry Matcha Latte',      price: 18, categorySlug: 'matcha' },
+    // Food
+    { name: 'Ham & Cheese Sandwich',               description: 'Side of chips',      price: 15, categorySlug: 'sandwiches' },
+    { name: 'Smoked Salmon & Cream Cheese',        description: 'Side of chips',      price: 15, categorySlug: 'sandwiches' },
+    { name: 'Kimchi Ramyeon',                      price: 15, categorySlug: 'noodles' },
+    { name: 'Peanut Butter Chili Udon',            description: 'Warning: creamy!',   price: 16, categorySlug: 'noodles' },
+    { name: 'Salmon Ochazuke',                     price: 19, categorySlug: 'rice-bowls' },
+    { name: 'Chicky Rice Bowl',                    price: 19, categorySlug: 'rice-bowls' },
+    { name: 'Torched Mentaiko Tamagoyaki Bowl',    price: 18, categorySlug: 'rice-bowls' },
+    // Pastries & Snacks
+    { name: 'Croissant',               price:  9, categorySlug: 'pastries' },
+    { name: 'Shio Pan (Salt Bread)',   price:  9, categorySlug: 'pastries' },
+    { name: 'Chocolate Danish',        price: 13, categorySlug: 'pastries' },
+    { name: 'Chicken Pepperoni Danish',price: 15, categorySlug: 'pastries' },
+    { name: 'Chocolate Brownie',       description: 'Limited', price: 15, categorySlug: 'pastries' },
+    { name: 'Chicken Nuggets',         price: 13, categorySlug: 'finger-foods' },
+    { name: 'Tom Yum Popcorn Chicken', price: 14, categorySlug: 'finger-foods' },
+    { name: 'Potato Wedges',           price: 12, categorySlug: 'finger-foods' },
+    // Specials
+    { name: 'Salty Jasmine Grapefruit', price: 13, categorySlug: 'specials' },
+    { name: 'Tropical Mango-Longan',    price: 13, categorySlug: 'specials' },
+    { name: 'Sweet Lavender Lychee',    price: 13, categorySlug: 'specials' },
+  ];
+
+  for (const item of menuItems) {
+    await prisma.menuItem.upsert({
+      where: { name: item.name },
+      update: { price: item.price, description: item.description ?? null },
       create: {
-        name: 'Americano',
-        category: MenuItemCategory.Drink,
-        price: 8.0,
-        description: 'Classic black coffee',
+        name: item.name,
+        price: item.price,
+        description: item.description ?? null,
+        category: { connect: { slug: item.categorySlug } },
       },
-    }),
-    prisma.menuItem.upsert({
-      where: { id: 2 },
-      update: {},
-      create: {
-        name: 'Chicken Sandwich',
-        category: MenuItemCategory.Food,
-        price: 15.0,
-        description: 'Grilled chicken with lettuce and mayo',
-      },
-    }),
-    prisma.menuItem.upsert({
-      where: { id: 3 },
-      update: {},
-      create: {
-        name: 'Granola Bar',
-        category: MenuItemCategory.Snack,
-        price: 5.0,
-        description: 'Healthy oat & honey bar',
-      },
-    }),
-  ]);
-  console.log('✅ Menu items:', menuItems.map((m) => m.name).join(', '));
+    });
+  }
+  console.log(`✅ Menu items: ${menuItems.length} items seeded across ${categories.length} categories`);
 
   // ─── Customer: Aliffie ────────────────────────────────────────────────────
   const aliffie = await prisma.user.upsert({

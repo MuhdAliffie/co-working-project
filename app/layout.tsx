@@ -27,6 +27,10 @@ export default function RootLayout({
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
         />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Gaegu:wght@300;400;700&family=Nunito:wght@400;600;700;800&family=Patrick+Hand&display=swap"
+        />
       </head>
       <body className={`${inter.variable} ${dmSerif.variable} antialiased font-sans`}>
         <ThemeProvider>{children}</ThemeProvider>

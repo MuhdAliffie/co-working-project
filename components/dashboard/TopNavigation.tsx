@@ -10,31 +10,38 @@ export type NavItem = {
   isActive?: boolean
 }
 
-const activeClasses =
-  'text-slate-900 dark:text-white border-b-2 border-emerald-400 pb-1 font-semibold'
-const inactiveClasses = 'text-slate-500 hover:text-emerald-400 transition-colors'
+const ICON_VAR = "'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 48"
 
 const TopNavigation: FC<{ navItems: NavItem[] }> = ({ navItems }) => {
   const { theme, toggleTheme } = useTheme()
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-emerald-200/40 bg-white/80 dark:bg-slate-950/70 backdrop-blur-xl px-4 md:px-10 py-3">
+    <header className="sticky top-0 z-50 w-full bg-cloud-cream/90 backdrop-blur-sm px-6 md:px-10 py-4 border-b-2 border-dashed border-cloud-green">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="flex items-center gap-8">
           <div className="flex items-center gap-2 group cursor-pointer">
-            <div className="bg-emerald-400 p-1.5 rounded-lg flex items-center justify-center">
-              <span className="material-symbols-outlined text-slate-950 text-xl font-bold">eco</span>
+            <div className="bg-cloud-green p-2 wavy-border shadow-sm">
+              <span
+                className="material-symbols-outlined text-cloud-dark-green text-2xl"
+                style={{ fontVariationSettings: ICON_VAR }}
+              >
+                filter_drama
+              </span>
             </div>
-            <p className="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-              Cloudsy
-            </p>
+            <h1 className="text-2xl font-handwritten font-bold tracking-tight text-cloud-dark-green">
+              Cloudsy Dashboard
+            </h1>
           </div>
           <nav className="hidden md:flex items-center gap-6">
             {navItems.map((item) => (
               <a
                 key={item.label}
                 href={item.href}
-                className={`text-sm ${item.isActive ? activeClasses : inactiveClasses}`.trim()}
+                className={`text-lg font-handwritten font-semibold transition-colors ${
+                  item.isActive
+                    ? 'text-cloud-dark-green font-bold underline decoration-wavy underline-offset-4'
+                    : 'text-stone-500 hover:text-cloud-green'
+                }`}
               >
                 {item.label}
               </a>
@@ -43,35 +50,47 @@ const TopNavigation: FC<{ navItems: NavItem[] }> = ({ navItems }) => {
         </div>
         <div className="flex items-center gap-4">
           <div className="relative hidden sm:block">
-            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">
-              search
-            </span>
             <input
               type="text"
-              placeholder="Search passes..."
-              className="pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-900/60 border border-transparent rounded-lg text-sm focus:ring-2 focus:ring-emerald-400 w-64 transition-all"
+              placeholder="Find a cloud..."
+              className="pl-4 pr-10 py-2 bg-white border-2 border-cloud-green rounded-full text-sm font-handwritten focus:ring-2 focus:ring-cloud-green transition-all"
             />
+            <span
+              className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-cloud-green text-sm"
+              style={{ fontVariationSettings: ICON_VAR }}
+            >
+              search
+            </span>
           </div>
           <button
             type="button"
             onClick={toggleTheme}
-            aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
-            className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors"
+            className="size-10 bg-white wavy-border flex items-center justify-center hover:rotate-6 transition-transform"
+            aria-label="Toggle theme"
           >
-            <span className="material-symbols-outlined text-base">
+            <span
+              className="material-symbols-outlined text-cloud-dark-green text-xl"
+              style={{ fontVariationSettings: ICON_VAR }}
+            >
               {theme === 'dark' ? 'light_mode' : 'dark_mode'}
             </span>
           </button>
-          <button className="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-900 rounded-lg relative">
-            <span className="material-symbols-outlined">notifications</span>
-            <span className="absolute top-2 right-2 w-2 h-2 bg-emerald-400 rounded-full border-2 border-white dark:border-slate-950" />
+          <button className="size-10 bg-white wavy-border flex items-center justify-center hover:rotate-3 transition-transform relative">
+            <span
+              className="material-symbols-outlined text-cloud-dark-green"
+              style={{ fontVariationSettings: ICON_VAR }}
+            >
+              notifications
+            </span>
+            <span className="absolute top-1 right-1 w-2 h-2 bg-red-400 rounded-full border border-white" />
           </button>
-          <div className="h-9 w-9 rounded-full bg-emerald-300/30 border-2 border-emerald-400 overflow-hidden relative">
+          <div className="h-11 w-11 wavy-border overflow-hidden rotate-3 bg-white p-0.5">
             <Image
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuDmLYfELESEgupC9WoKxSliAkkZdWEdXA1EddW9mzWP_AP97N85jIr2OHKs5vmwPSAFhSfWX4ju9nOeb5ONgZIKgvly7YL-mbYoiQzbtGLX3ius1D1FxjU84WC0g-4Agi6uAXTMf5eLOjA9vI_pJlUHcfHB7Ogza7dsQk9uIiyEirFDQeIgmyuqMv_8YYYIbGNEi-MxmeAOH9VywpTJ6z-M5bj9Mcj3tgJu-8_iashO0H_bcS-iL8p-IackoAGqYPCe0k2HA4dQGJju"
-              alt="User avatar"
-              fill
-              className="object-cover"
+              alt="User Avatar"
+              width={44}
+              height={44}
+              className="object-cover rounded-sm w-full h-full"
               unoptimized
             />
           </div>
